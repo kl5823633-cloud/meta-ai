@@ -8,38 +8,99 @@
   <style>
     :root {
       --neon-purple: #a78bfa;
-      --neon-glow: 0 0 10px #a78bfa, 0 0 20px #a78bfa, 0 0 40px #7c3aed;
-      --bg-dark: #0f0f1a;
-      --card-bg: #1a1a2e;
+      --neon-glow: 0 0 10px #a78bfa, 0 0 20px #7c3aed66;
+      --bg-dark: #0a0a14;
+      --card-bg: #1a1a2ed9;
+      --star-color: rgba(255, 255, 255, 0.7);
     }
+
+    /* Hiệu ứng vũ trụ sao lấp lánh mờ ảo */
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #0f0f1a, #1a0033);
+      background: radial-gradient(ellipse at 40% 50%, #1e1033, #03010a);
       color: white;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
+      position: relative;
     }
+
+    /* Tầng sao nền - hiệu ứng lấp lánh */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(1px 1px at 5% 10%, var(--star-color), rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 15% 30%, var(--star-color), rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 25% 60%, var(--star-color), rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 35% 85%, var(--star-color), rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50% 20%, var(--star-color), rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 65% 45%, var(--star-color), rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 80% 70%, var(--star-color), rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 92% 35%, var(--star-color), rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 48% 92%, var(--star-color), rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 72% 15%, var(--star-color), rgba(0,0,0,0));
+      background-repeat: no-repeat;
+      opacity: 0.6;
+      animation: twinkle 4s infinite alternate;
+      pointer-events: none;
+    }
+
+    /* Hiệu ứng ánh sáng khuếch tán mờ ảo */
+    body::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 70% 30%, rgba(123, 31, 162, 0.2), transparent 40%),
+                  radial-gradient(circle at 20% 80%, rgba(76, 29, 149, 0.2), transparent 40%);
+      filter: blur(60px);
+      pointer-events: none;
+      animation: nebula 20s infinite alternate ease-in-out;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.5; }
+      100% { opacity: 0.9; }
+    }
+
+    @keyframes nebula {
+      0% { transform: scale(1) rotate(0deg); opacity: 0.5; }
+      100% { transform: scale(1.2) rotate(5deg); opacity: 0.8; }
+    }
+
     .container {
       width: 90%;
       max-width: 600px;
       background: var(--card-bg);
+      backdrop-filter: blur(8px);
       border-radius: 20px;
-      box-shadow: var(--neon-glow);
+      box-shadow: var(--neon-glow), 0 0 30px #3b076450;
       overflow: hidden;
-      border: 2px solid var(--neon-purple);
+      border: 1px solid var(--neon-purple);
+      position: relative;
+      z-index: 2;
     }
+
     .header {
-      background: linear-gradient(90deg, #4c1d95, #7c3aed);
+      background: linear-gradient(90deg, #2e1065b3, #4c1d95b3);
       padding: 20px;
       text-align: center;
       font-size: 1.8rem;
       font-weight: bold;
-      text-shadow: 0 0 10px #fff;
+      text-shadow: 0 0 15px #a78bfa;
+      backdrop-filter: blur(5px);
     }
+
     .admin-credit {
       text-align: center;
       font-size: 0.9rem;
@@ -47,51 +108,86 @@
       padding: 5px 0;
       background: rgba(0,0,0,0.3);
     }
+
     .api-section {
       padding: 15px;
-      border-bottom: 1px solid #333;
-      display: none; /* Ẩn input nếu dùng key hard-code */
+      border-bottom: 1px solid #33415566;
     }
+
+    .api-input {
+      width: 100%;
+      padding: 12px;
+      background: #0f0f1fbf;
+      border: 1px solid var(--neon-purple);
+      border-radius: 10px;
+      color: white;
+      font-size: 1rem;
+      box-shadow: inset 0 0 5px #a78bfa66, 0 0 8px #7c3aed33;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s;
+    }
+
+    .api-input:focus {
+      outline: none;
+      box-shadow: inset 0 0 8px #a78bfa, 0 0 15px #a78bfa;
+    }
+
     .chat-area {
-      height: 420px;
+      height: 400px;
       overflow-y: auto;
       padding: 15px;
       display: flex;
       flex-direction: column;
       gap: 15px;
     }
+
     .message {
       max-width: 80%;
       padding: 12px 18px;
       border-radius: 18px;
       line-height: 1.5;
       animation: fadeIn 0.3s;
+      backdrop-filter: blur(5px);
     }
+
     .user {
       align-self: flex-end;
-      background: linear-gradient(90deg, #6d28d9, #a78bfa);
+      background: linear-gradient(90deg, #6d28d9cc, #a78bfacc);
       color: white;
+      box-shadow: 0 0 15px #a78bfa66;
+      border: 1px solid #ffffff33;
     }
+
     .bot {
       align-self: flex-start;
-      background: #2a2a3e;
+      background: #1a1a2ed9;
       border: 1px solid var(--neon-purple);
       box-shadow: var(--neon-glow);
+      backdrop-filter: blur(10px);
+      color: #f3e8ff;
     }
+
     .input-area {
       display: flex;
       padding: 15px;
-      border-top: 1px solid #333;
+      border-top: 1px solid #33415566;
     }
+
     .input-msg {
       flex: 1;
       padding: 12px;
-      background: #2a2a3e;
+      background: #0f0f1fbf;
       border: 1px solid var(--neon-purple);
       border-radius: 30px 0 0 30px;
       color: white;
       outline: none;
+      backdrop-filter: blur(4px);
     }
+
+    .input-msg:focus {
+      box-shadow: inset 0 0 8px #a78bfa66;
+    }
+
     .send-btn {
       padding: 12px 20px;
       background: var(--neon-purple);
@@ -100,24 +196,40 @@
       color: white;
       cursor: pointer;
       transition: all 0.3s;
+      backdrop-filter: blur(4px);
     }
-    .send-btn:hover { background: #7c3aed; box-shadow: var(--neon-glow); }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
+
+    .send-btn:hover { 
+      background: #7c3aed; 
+      box-shadow: var(--neon-glow), 0 0 20px #a78bfa; 
+    }
+
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(10px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    ::-webkit-scrollbar { width: 6px; } 
+    ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
+    a { text-decoration: none; font-weight: 500; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">Neon AI Chatbot</div>
     <div class="admin-credit">Made by tkhang</div>
-    
-    <!-- Input API Key ẩn vì đã hard-code -->
-   // const API_KEY = "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";  // Xóa hoặc comment
-const apiKeyInput = document.getElementById('apiKey'); // Thêm input lại nếu ẩn
-const apiKey = apiKeyInput.value.trim() || ''; // Nếu bỏ trống thì báo lỗi
+
+    <div class="api-section">
+      <!-- Đã ẩn API key và set mặc định là 123 -->
+      <input type="password" id="apiKey" class="api-input" value="123" placeholder="API Key (ẩn) mặc định: 123" />
+    </div>
 
     <div class="chat-area" id="chatArea">
-      <div class="message bot">Xin chào! Tôi là AI Assistant neon của bạn 💜<br>Hỏi gì cũng được nhé, từ chuyện vui đến code, thời tiết HCMC... 😏</div>
+      <div class="message bot">
+        ✨ Xin chào! Tôi là AI Assistant neon của bạn 💜<br>
+        API key mặc định đã được điền sẵn (***). <br>
+        Bạn có thể dùng key <strong>123</strong> hoặc nhập key OpenRouter nếu muốn.
+      </div>
     </div>
 
     <div class="input-area">
@@ -130,9 +242,7 @@ const apiKey = apiKeyInput.value.trim() || ''; // Nếu bỏ trống thì báo l
     const chatArea = document.getElementById('chatArea');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
-
-    // API Key hard-code của bạn (đừng share file này!)
-    const API_KEY = "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";
+    const apiKeyInput = document.getElementById('apiKey');
 
     function addMessage(text, isUser = false) {
       const msg = document.createElement('div');
@@ -149,6 +259,12 @@ const apiKey = apiKeyInput.value.trim() || ''; // Nếu bỏ trống thì báo l
       addMessage(message, true);
       userInput.value = '';
 
+      const API_KEY = apiKeyInput.value.trim();
+      if (!API_KEY) {
+        addMessage("Vui lòng nhập API Key (mặc định là 123) để chat nhé!", false);
+        return;
+      }
+
       // Typing indicator
       const typingMsg = document.createElement('div');
       typingMsg.classList.add('message', 'bot');
@@ -157,38 +273,55 @@ const apiKey = apiKeyInput.value.trim() || ''; // Nếu bỏ trống thì báo l
       chatArea.scrollTop = chatArea.scrollHeight;
 
       try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${API_KEY}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://your-neon-chatbot.com', // Optional, thay nếu deploy
-            'X-Title': 'Neon AI Chatbot by tkhang'
-          },
-          body: JSON.stringify({
-            model: 'qwen/qwen3-next-80b-a3b-instruct:free', // Model free mạnh, đổi nếu muốn
-            messages: [
-              { role: 'system', content: 'Bạn là AI trợ lý thông minh, hài hước, thân thiện, trả lời tự nhiên bằng tiếng Việt, phong cách neon vui vẻ và hiện đại.' },
-              { role: 'user', content: message }
-            ],
-            temperature: 0.75,
-            max_tokens: 1200,
-            stream: false
-          })
-        });
+        // Gọi API OpenRouter nếu key dài (dạng sk-or...)
+        // Nếu key là "123" thì giả lập phản hồi để demo, không gọi thật
+        let reply = '';
+        
+        if (API_KEY === '123') {
+          // Giả lập phản hồi cho key mặc định 123
+          await new Promise(resolve => setTimeout(resolve, 800)); // delay giả lập
+          reply = `Bạn đã dùng key mặc định 123. Đây là tin nhắn demo từ hệ thống.\n\nBạn nói: "${message}"\n\n(Để dùng AI thật, hãy nhập OpenRouter key dạng sk-or...).`;
+        } else {
+          // Gọi thật OpenRouter
+          const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${API_KEY}`,
+              'Content-Type': 'application/json',
+              'X-Title': 'Neon AI Chatbot by tkhang'
+            },
+            body: JSON.stringify({
+              model: 'arcee-ai/trinity-large-preview:free',
+              messages: [
+                { role: 'system', content: 'Bạn là AI trợ lý thông minh, hài hước, thân thiện, trả lời tự nhiên bằng tiếng Việt, phong cách neon vui vẻ và hiện đại.' },
+                { role: 'user', content: message }
+              ],
+              temperature: 0.75,
+              max_tokens: 1200,
+              stream: false
+            })
+          });
 
-        typingMsg.remove();
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Lỗi ${response.status}: ${response.statusText} - ${errorText}`);
+          }
 
-        if (!response.ok) {
-          throw new Error(`Lỗi ${response.status}: ${response.statusText}`);
+          const data = await response.json();
+          reply = data.choices[0].message.content;
         }
 
-        const data = await response.json();
-        const reply = data.choices[0].message.content;
+        typingMsg.remove();
         addMessage(reply);
       } catch (err) {
         typingMsg.remove();
-        addMessage(`Ối! Có lỗi: ${err.message}<br>Kiểm tra key hoặc rate limit nhé (free model giới hạn ~50-200 tin/ngày).`, false);
+        let errorMsg = `Ối! Có lỗi: ${err.message}`;
+        if (err.message.includes('401')) {
+          errorMsg += "<br>Key không hợp lệ hoặc đã bị thu hồi. Hãy tạo key mới tại openrouter.ai/keys";
+        } else if (err.message.includes('429')) {
+          errorMsg += "<br>Đã hết giới hạn free hôm nay (~50-200 tin/ngày). Chờ reset hoặc thử key khác.";
+        }
+        addMessage(errorMsg, false);
       }
     }
 
