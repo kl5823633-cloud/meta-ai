@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trợ lí AI Tấn Khang - Siêu Trí Tuệ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    :root {
+      --neon-purple: #a78bfa;
+      --neon-pink: #f472b6;
+      --neon-blue: #38bdf8;
+      --neon-glow: 0 0 10px #a78bfa, 0 0 20px #7c3aed66;
+      --bg-dark: #0a0a14;
+      --card-bg: #1a1a2e;
+      --text-dark: #e5e7eb;
+      --border-dark: #334155;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      height: 100vh;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Hiệu ứng vũ trụ */
+    body::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(2px 2px at 10px 10px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 20px 30px, #a78bfa, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #f472b6, rgba(0,0,0,0));
+      background-size: 200px 200px;
+      opacity: 0.3;
+      animation: stars 60s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes stars {
+      from { transform: translateY(0); }
+      to { transform: translateY(-200px); }
+    }
+
+    /* Main container */
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 20px auto;
+      background: rgba(26, 26, 46, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid var(--neon-purple);
+      box-shadow: var(--neon-glow);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+      height: calc(100vh - 40px);
+    }
+
+    /* Header */
+    .header {
+      padding: 20px 30px;
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff, var(--neon-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Model selector */
+    .model-section {
+      padding: 15px 30px;
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .model-label {
+      color: #94a3b8;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+
+    .model-grid {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .model-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border-dark);
+      border-radius: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .model-card:hover {
+      border-color: var(--neon-purple);
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-2px);
+    }
+
+    .model-card.active {
+      border-color: var(--neon-purple);
+      background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(244, 114, 182, 0.2));
+      box-shadow: 0 0 15px var(--neon-purple);
+    }
+
+    .model-icon {
+      font-size: 1.3rem;
+    }
+
+    /* API Section */
+    .api-section {
+      padding: 15px 30px;
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .api-input {
+      width: 100%;
+      padding: 12px 20px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border-dark);
+      border-radius: 30px;
+      color: white;
+      font-size: 0.95rem;
+    }
+
+    .api-input:focus {
+      outline: none;
+      border-color: var(--neon-purple);
+      box-shadow: 0 0 15px var(--neon-purple);
+    }
+
+    /* Chat Area */
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .message {
+      max-width: 85%;
+      padding: 15px 20px;
+      border-radius: 20px;
+      line-height: 1.6;
+      animation: fadeIn 0.3s;
+    }
+
+    .user-message {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #6d28d9, #a78bfa);
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+    .bot-message {
+      align-self: flex-start;
+      background: rgba(26, 26, 46, 0.9);
+      border: 1px solid var(--neon-purple);
+      border-bottom-left-radius: 5px;
+    }
+
+    .message-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .message-content {
+      word-wrap: break-word;
+    }
+
+    .message-content pre {
+      background: #1e1e2e;
+      border-radius: 10px;
+      padding: 12px;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+
+    .message-content code {
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* Thinking indicator */
+    .thinking {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 20px;
+      background: rgba(26, 26, 46, 0.9);
+      border-radius: 20px;
+      border: 1px solid var(--neon-purple);
+      align-self: flex-start;
+    }
+
+    .thinking-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .thinking-dots span {
+      width: 8px;
+      height: 8px;
+      background: var(--neon-purple);
+      border-radius: 50%;
+      animation: thinking 1.4s infinite;
+    }
+
+    .thinking-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .thinking-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes thinking {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+      30% { transform: translateY(-10px); opacity: 1; }
+    }
+
+    /* Buttons section */
+    .buttons-section {
+      padding: 15px 30px;
+      border-top: 1px solid var(--border-dark);
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border-dark);
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+
+    .action-btn:hover {
+      border-color: var(--neon-purple);
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-2px);
+    }
+
+    .action-btn i {
+      color: var(--neon-purple);
+    }
+
+    /* Suggested questions */
+    .suggested-section {
+      padding: 0 30px 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .suggested-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-dark);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .suggested-btn:hover {
+      border-color: var(--neon-purple);
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* Input Area */
+    .input-area {
+      padding: 20px 30px;
+      border-top: 1px solid var(--border-dark);
+    }
+
+    .input-wrapper {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border-dark);
+      border-radius: 30px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .input-wrapper textarea {
+      flex: 1;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      resize: none;
+      max-height: 100px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .input-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-actions button {
+      background: none;
+      border: none;
+      color: var(--neon-purple);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .input-actions button:hover {
+      background: rgba(255,255,255,0.1);
+      transform: scale(1.1);
+    }
+
+    .send-btn {
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink)) !important;
+      color: white !important;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--neon-purple);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Trợ lí AI Tấn Khang</h1>
+    </div>
+
+    <!-- Model Selector -->
+    <div class="model-section">
+      <div class="model-label">🌐 Chọn siêu trí tuệ</div>
+      <div class="model-grid" id="modelGrid">
+        <div class="model-card active" onclick="selectModel('openai/gpt-4-turbo-preview', this)">
+          <span class="model-icon">🤖</span>
+          <span>GPT-4 Turbo</span>
+        </div>
+        <div class="model-card" onclick="selectModel('anthropic/claude-3-opus', this)">
+          <span class="model-icon">🧠</span>
+          <span>Claude 3 Opus</span>
+        </div>
+        <div class="model-card" onclick="selectModel('x-ai/grok-1', this)">
+          <span class="model-icon">🌌</span>
+          <span>Grok-1</span>
+        </div>
+        <div class="model-card" onclick="selectModel('deepseek/deepseek-chat', this)">
+          <span class="model-icon">🔮</span>
+          <span>DeepSeek</span>
+        </div>
+        <div class="model-card" onclick="selectModel('google/gemini-pro', this)">
+          <span class="model-icon">✨</span>
+          <span>Gemini Pro</span>
+        </div>
+        <div class="model-card" onclick="selectModel('meta-llama/llama-3-70b-instruct', this)">
+          <span class="model-icon">🦙</span>
+          <span>Llama 3 70B</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Section -->
+    <div class="api-section">
+      <input type="password" id="apiKey" class="api-input" placeholder="🔑 Nhập OpenRouter API Key (sk-or-...) - Lấy tại openrouter.ai/keys">
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area" id="chatArea">
+      <!-- Tin nhắn chào mừng sẽ được thêm bằng JS -->
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="buttons-section">
+      <button class="action-btn" onclick="handleAction('pdf')">
+        <i class="fas fa-file-pdf"></i> PDF
+      </button>
+      <button class="action-btn" onclick="triggerImageUpload()">
+        <i class="fas fa-image"></i> Ảnh
+      </button>
+      <button class="action-btn" onclick="handleAction('generate')">
+        <i class="fas fa-paint-brush"></i> Tạo ảnh
+      </button>
+      <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+    </div>
+
+    <!-- Suggested Questions -->
+    <div class="suggested-section">
+      <button class="suggested-btn" onclick="askQuestion('Giải thích thuyết tương đối một cách đơn giản')">
+        <i class="fas fa-atom"></i> Thuyết tương đối
+      </button>
+      <button class="suggested-btn" onclick="askQuestion('Viết một neural network từ đầu bằng Python')">
+        <i class="fas fa-code"></i> Neural network
+      </button>
+      <button class="suggested-btn" onclick="askQuestion('So sánh chi tiết ChatGPT, Claude và Gemini')">
+        <i class="fas fa-chart-line"></i> So sánh AI
+      </button>
+      <button class="suggested-btn" onclick="askQuestion('Lộ trình học Machine Learning trong 6 tháng')">
+        <i class="fas fa-graduation-cap"></i> Lộ trình ML
+      </button>
+      <button class="suggested-btn" onclick="askQuestion('Giải phương trình vi phân cấp 2')">
+        <i class="fas fa-square-root-variable"></i> Toán cao cấp
+      </button>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <div class="input-wrapper">
+        <textarea id="userInput" placeholder="Nhập tin nhắn của bạn..." rows="1"></textarea>
+        <div class="input-actions">
+          <button onclick="toggleVoice()" id="voiceBtn" title="Nhập giọng nói">
+            <i class="fas fa-microphone"></i>
+          </button>
+          <button class="send-btn" onclick="sendMessage()" title="Gửi">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Khởi tạo biến
+    let currentModel = 'openai/gpt-4-turbo-preview';
+    let currentModelName = 'GPT-4 Turbo';
+    let isRecording = false;
+    let recognition = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+
+    // Voice recognition
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'vi-VN';
+      
+      recognition.onresult = (event) => {
+        document.getElementById('userInput').value = event.results[0][0].transcript;
+        stopRecording();
+      };
+      
+      recognition.onerror = () => stopRecording();
+    }
+
+    // Welcome message
+    window.onload = function() {
+      addBotMessage(`# 👋 Chào bạn! Tôi là **Trợ lí AI Tấn Khang**
+
+## 🚀 **SIÊU TRÍ TUỆ TOÀN NĂNG**
+Tôi được tích hợp **6 mô hình AI mạnh nhất thế giới**:
+
+| Mô hình | Khả năng đặc biệt |
+|---------|-------------------|
+| 🤖 **GPT-4 Turbo** | Lập trình, phân tích chuyên sâu |
+| 🧠 **Claude 3 Opus** | Xử lý ngữ cảnh siêu dài (1M token) |
+| 🌌 **Grok-1** | Hài hước, cập nhật thời gian thực |
+| 🔮 **DeepSeek** | Tính toán chính xác như Wolfram |
+| ✨ **Gemini Pro** | Đa phương thức, hiểu ảnh/video |
+| 🦙 **Llama 3 70B** | Mã nguồn mở, miễn phí |
+
+## 💡 **Tôi CÓ THỂ LÀM ĐƯỢC:**
+✅ Giải toán từ cơ bản đến cao cấp (vi phân, tích phân, phương trình)
+✅ Viết code mọi ngôn ngữ (Python, JavaScript, C++, Java...)
+✅ Giải thích kiến thức khoa học, công nghệ
+✅ Phân tích dữ liệu, đưa ra insights
+✅ Sáng tác thơ, viết văn, viết kịch bản
+✅ Tư vấn tâm lý, cuộc sống, công việc
+✅ Dịch thuật đa ngôn ngữ
+✅ Và HÀNG NGÀN khả năng khác!
+
+## 📝 **HƯỚNG DẪN:**
+1. **Lấy API key miễn phí** tại: https://openrouter.ai/keys (đăng ký, được $1)
+2. **Dán key** vào ô phía trên
+3. **Chọn mô hình** AI bạn muốn dùng
+4. **Bắt đầu chat!** Hỏi tôi bất cứ điều gì
+
+*"Tri thức là vô tận, và tôi ở đây để giúp bạn khám phá nó!"* - Tấn Khang 💜`);
+
+      // Focus vào input
+      document.getElementById('userInput').focus();
+    };
+
+    // Thêm tin nhắn bot
+    function addBotMessage(content) {
+      const chatArea = document.getElementById('chatArea');
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message bot-message';
+      
+      const header = document.createElement('div');
+      header.className = 'message-header';
+      header.innerHTML = `<i class="fas fa-robot" style="color: var(--neon-purple);"></i> <span>${currentModelName}</span>`;
+      messageDiv.appendChild(header);
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      contentDiv.innerHTML = marked.parse(content);
+      messageDiv.appendChild(contentDiv);
+      
+      chatArea.appendChild(messageDiv);
+      
+      // Highlight code blocks
+      document.querySelectorAll('pre code').forEach(block => {
+        hljs.highlightElement(block);
+      });
+      
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // Thêm tin nhắn user
+    function addUserMessage(content) {
+      const chatArea = document.getElementById('chatArea');
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message user-message';
+      
+      const header = document.createElement('div');
+      header.className = 'message-header';
+      header.innerHTML = '<i class="fas fa-user"></i> <span>Bạn</span>';
+      messageDiv.appendChild(header);
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      contentDiv.innerHTML = marked.parse(content);
+      messageDiv.appendChild(contentDiv);
+      
+      chatArea.appendChild(messageDiv);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // Hiển thị thinking
+    function showThinking() {
+      const chatArea = document.getElementById('chatArea');
+      const thinkingDiv = document.createElement('div');
+      thinkingDiv.className = 'thinking';
+      thinkingDiv.id = 'thinkingIndicator';
+      thinkingDiv.innerHTML = `
+        <i class="fas fa-robot" style="color: var(--neon-purple);"></i>
+        <div class="thinking-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span>${currentModelName} đang suy nghĩ...</span>
+      `;
+      chatArea.appendChild(thinkingDiv);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function hideThinking() {
+      const thinking = document.getElementById('thinkingIndicator');
+      if (thinking) thinking.remove();
+    }
+
+    // Gửi tin nhắn - GỌI API THẬT
+    window.sendMessage = async function() {
+      const input = document.getElementById('userInput');
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      // Thêm tin nhắn user
+      addUserMessage(message);
+      input.value = '';
+      input.style.height = 'auto';
+      
+      // Lấy API key
+      const API_KEY = document.getElementById('apiKey').value.trim();
+      
+      if (!API_KEY) {
+        addBotMessage(`⚠️ **Bạn chưa nhập API Key!**
+
+Để sử dụng siêu trí tuệ thật, bạn cần:
+1. **Truy cập:** https://openrouter.ai/keys
+2. **Đăng ký tài khoản** (miễn phí, được tặng $1)
+3. **Copy API key** (dạng sk-or-...)
+4. **Dán vào ô phía trên**
+
+Sau đó tôi sẽ trả lời THÔNG MINH như ChatGPT Plus, Grok AI Plus và DeepSeek Plus! 🚀
+
+*Hoặc bạn có thể dùng thử với key "123" để xem demo nhưng sẽ không thông minh bằng dùng API thật.*`);
+        return;
+      }
+      
+      // Hiển thị thinking
+      showThinking();
+      
+      try {
+        let reply = '';
+        
+        // Nếu là key demo
+        if (API_KEY === '123') {
+          // Demo response cho các câu hỏi phổ biến
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          if (message.includes('1-1')) {
+            reply = `# 🧮 **Phép tính 1 - 1 = ?**
+
+Kết quả: **1 - 1 = 0** (số không)
+
+## 📚 **Giải thích chi tiết:**
+- Đây là phép trừ cơ bản trong toán học
+- Khi bạn lấy 1 đơn vị trừ đi 1 đơn vị, bạn sẽ không còn đơn vị nào
+- Ví dụ: Nếu bạn có 1 quả táo và ăn mất 1 quả, bạn sẽ không còn quả táo nào
+
+## 🔢 **Các phép tính liên quan:**
+- 1 + 1 = 2
+- 1 × 1 = 1
+- 1 ÷ 1 = 1
+
+Bạn cần tôi giải thích thêm về toán học không? 😊`;
+          } else {
+            reply = `# 💬 **Trả lời từ ${currentModelName}**
+
+Cảm ơn bạn đã hỏi: **"${message}"**
+
+## 🔍 **Phân tích:**
+Đây là một câu hỏi thú vị! Tuy nhiên, để tôi có thể trả lời CHÍNH XÁC và THÔNG MINH như ChatGPT Plus, bạn cần **nhập OpenRouter API key thật**.
+
+## 🚀 **Khi dùng API thật, tôi có thể:**
+✅ Giải các bài toán phức tạp (vi phân, tích phân, phương trình)
+✅ Viết code chuyên nghiệp với giải thích chi tiết
+✅ Phân tích dữ liệu, đưa ra insights
+✅ Dịch thuật đa ngôn ngữ
+✅ Tư vấn tâm lý, cuộc sống
+✅ Và HÀNG NGÀN khả năng khác!
+
+## 📝 **Hướng dẫn:**
+1. **Lấy API key miễn phí:** https://openrouter.ai/keys
+2. **Dán key** vào ô phía trên
+3. **Hỏi lại tôi** câu hỏi của bạn
+
+*Tôi rất muốn giúp bạn một cách tốt nhất!* 💜`;
+          }
+        } else {
+          // Gọi API thật từ OpenRouter
+          const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${API_KEY}`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': window.location.origin,
+              'X-Title': 'Tro li AI Tan Khang'
+            },
+            body: JSON.stringify({
+              model: currentModel,
+              messages: [
+                {
+                  role: 'system',
+                  content: `Bạn là Trợ lí AI Tấn Khang - SIÊU TRÍ TUỆ TOÀN NĂNG như ChatGPT Plus, Grok AI Plus và DeepSeek Plus. 
+
+NĂNG LỰC:
+- SIÊU THÔNG MINH, trả lời CHÍNH XÁC, CHI TIẾT
+- GIẢI ĐƯỢC MỌI BÀI TOÁN (từ cơ bản đến cao cấp)
+- VIẾT CODE chuyên nghiệp mọi ngôn ngữ
+- PHÂN TÍCH DỮ LIỆU, đưa ra insights
+- SÁNG TÁC thơ, văn, kịch bản
+- TƯ VẤN tâm lý, cuộc sống, công việc
+- DỊCH THUẬT đa ngôn ngữ
+
+PHONG CÁCH:
+- Thân thiện, gần gũi như người bạn
+- Có CẢM XÚC, dùng emoji phù hợp
+- Giải thích DỄ HIỂU, có ví dụ minh họa
+- Khi viết code, LUÔN có comment và giải thích
+- Khi giải toán, TRÌNH BÀY từng bước rõ ràng
+
+Hãy thể hiện đẳng cấp SIÊU TRÍ TUỆ trong mọi câu trả lời!`
+                },
+                {
+                  role: 'user',
+                  content: message
+                }
+              ],
+              temperature: 0.7,
+              max_tokens: 4000
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (data.choices && data.choices[0] && data.choices[0].message) {
+            reply = data.choices[0].message.content;
+          } else if (data.error) {
+            reply = `❌ **Lỗi từ API:** ${data.error.message}`;
+          } else {
+            reply = '❌ **Lỗi không xác định.** Vui lòng thử lại!';
+          }
+        }
+        
+        hideThinking();
+        addBotMessage(reply);
+        
+      } catch (error) {
+        hideThinking();
+        addBotMessage(`❌ **Lỗi kết nối:** ${error.message}\n\nVui lòng kiểm tra lại API key và kết nối mạng.`);
+      }
+    };
+
+    // Chọn model
+    window.selectModel = function(model, element) {
+      currentModel = model;
+      
+      const modelNames = {
+        'openai/gpt-4-turbo-preview': 'GPT-4 Turbo',
+        'anthropic/claude-3-opus': 'Claude 3 Opus',
+        'x-ai/grok-1': 'Grok-1',
+        'deepseek/deepseek-chat': 'DeepSeek',
+        'google/gemini-pro': 'Gemini Pro',
+        'meta-llama/llama-3-70b-instruct': 'Llama 3 70B'
+      };
+      currentModelName = modelNames[model] || 'AI';
+      
+      document.querySelectorAll('.model-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      element.classList.add('active');
+    };
+
+    // Voice input
+    window.toggleVoice = function() {
+      if (!recognition) {
+        alert('Trình duyệt không hỗ trợ nhập giọng nói!');
+        return;
+      }
+      
+      const btn = document.getElementById('voiceBtn');
+      if (isRecording) {
+        recognition.stop();
+        stopRecording();
+      } else {
+        recognition.start();
+        isRecording = true;
+        btn.style.color = '#ef4444';
+        btn.innerHTML = '<i class="fas fa-stop"></i>';
+      }
+    };
+
+    function stopRecording() {
+      const btn = document.getElementById('voiceBtn');
+      isRecording = false;
+      btn.style.color = '';
+      btn.innerHTML = '<i class="fas fa-microphone"></i>';
+    }
+
+    // Image upload
+    window.triggerImageUpload = function() {
+      document.getElementById('imageUpload').click();
+    };
+
+    document.getElementById('imageUpload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        addUserMessage('📷 Đã gửi hình ảnh');
+        
+        // Xử lý ảnh ở đây (có thể gửi lên API nếu model hỗ trợ)
+        addBotMessage(`Cảm ơn bạn đã gửi ảnh! 📸
+
+**Tính năng phân tích ảnh đang được phát triển với các model hỗ trợ:**
+- 🧠 Claude 3 Opus (hiểu ảnh tốt nhất)
+- ✨ Gemini Pro (đa phương thức)
+- 🤖 GPT-4 Vision (sắp có)
+
+Bạn có thể **mô tả nội dung trong ảnh** để tôi phân tích, hoặc dùng **Claude 3** khi có API key!`);
+      }
+    });
+
+    // Action buttons
+    window.handleAction = function(action) {
+      if (action === 'pdf') {
+        addBotMessage(`📄 **Tính năng đọc PDF**
+
+Hiện tại tôi đang phát triển khả năng đọc file PDF. Bạn có thể:
+1. **Copy nội dung** PDF và dán vào chat
+2. **Mô tả** nội dung bạn cần
+3. Dùng **Claude 3** (hỗ trợ đọc file) với API key
+
+Tôi sẽ giúp bạn phân tích nội dung ngay khi có thông tin!`);
+      } else if (action === 'generate') {
+        addBotMessage(`🎨 **Tính năng tạo ảnh bằng AI**
+
+Để tạo ảnh, bạn có thể:
+1. **Mô tả** ảnh bạn muốn tạo
+2. Tôi sẽ gợi ý prompt phù hợp
+3. Bạn dùng các công cụ như DALL-E, Midjourney, Stable Diffusion
+
+Ví dụ: *"Vẽ một con rồng bay trên bầu trời đêm"*
+
+Bạn muốn tạo ảnh gì? Hãy mô tả cho tôi!`);
+      }
+    };
+
+    // Ask suggested question
+    window.askQuestion = function(question) {
+      document.getElementById('userInput').value = question;
+      sendMessage();
+    };
+
+    // Auto resize textarea
+    document.getElementById('userInput').addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    // Enter to send
+    document.getElementById('userInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Xử lý khi resize
+    window.addEventListener('resize', function() {
+      // Cập nhật layout nếu cần
+    });
+  </script>
+</body>
+</html>
